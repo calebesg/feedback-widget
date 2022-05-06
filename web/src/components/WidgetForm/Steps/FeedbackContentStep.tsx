@@ -1,8 +1,10 @@
-import { ArrowLeft, Camera } from 'phosphor-react';
+import { ArrowLeft } from 'phosphor-react';
 import { FormEvent, useState } from 'react';
 import { FeedbackType, feedbackTypes } from '..';
+import { api } from '../../../libs/api';
 import { CloseButton } from '../../CloseButton';
-import { ScreenshotButton } from '../ScreenShotButton';
+import { Loading } from '../../Loading';
+import { ScreenshotButton } from '../ScreenshotButton';
 
 interface FeedbackContentStepProps {
   feedbackType: FeedbackType;
@@ -15,18 +17,28 @@ export function FeedbackContentStep({
   onFeedbackRestartRequested,
   onFeedbackSent,
 }: FeedbackContentStepProps) {
+  const [isSendingFeeedback, setIsSendingFeedback] = useState(false);
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [comment, setComment] = useState('');
 
   const feedbackTypeInfo = feedbackTypes[feedbackType];
 
-  function handlerSubmitFeedback(event: FormEvent) {
+  async function handlerSubmitFeedback(event: FormEvent) {
     event.preventDefault();
 
-    console.log({
-      comment,
-      screenshot,
-    });
+    setIsSendingFeedback(true);
+
+    try {
+      await api.post('/feedbacks', {
+        type: feedbackType,
+        comment,
+        screenshot,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingFeedback(true);
+    }
 
     onFeedbackSent();
   }
@@ -69,10 +81,10 @@ export function FeedbackContentStep({
 
           <button
             type="submit"
-            disabled={comment.length === 0}
+            disabled={comment.length === 0 || isSendingFeeedback}
             className="p-2 bg-brand-500 rounded-md border-transparent flex-1 flex justify-center items-center text-sm hover:bg-brand-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 transition-colors disabled:opacity-50 disabled:hover:bg-brand-500"
           >
-            Enviar Feedback
+            {isSendingFeeedback ? <Loading /> : 'Enviar Feedback'}
           </button>
         </footer>
       </form>
