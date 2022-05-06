@@ -16,7 +16,10 @@ export function ScreenshotButton({
   onRemoveShot,
 }: ScreenshotButtonProps) {
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={screenshot ? onRemoveShot : onTakeShot}
+    >
       {screenshot ? (
         <View>
           <Image source={{ uri: screenshot }} style={styles.image} />
