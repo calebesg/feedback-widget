@@ -29,6 +29,7 @@ export function FeedbackContentStep({
     setIsSendingFeedback(true);
 
     try {
+      console.log('URL:', import.meta.env.API_URL);
       await api.post('/feedbacks', {
         type: feedbackType,
         comment,
